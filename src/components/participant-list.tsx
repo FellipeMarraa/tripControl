@@ -1,23 +1,76 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
-import { ParticipantDialog } from "./participant-dialog"
-import type { Participant } from "../model/types.ts"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
+import {Edit, MoreHorizontal, Trash2} from "lucide-react"
+import {ParticipantDialog} from "./participant-dialog"
+import type {Expense, Participant, Payment} from "../model/types.ts"
 
 interface ParticipantListProps {
     participants: Participant[]
+    expenses: Expense[]
+    payments: Payment[]
     onEditParticipant: (participant: Participant) => void
     onDeleteParticipant: (id: string) => void
 }
 
-export function ParticipantList({ participants, onEditParticipant, onDeleteParticipant }: ParticipantListProps) {
+
+export function ParticipantList({ participants, onEditParticipant, onDeleteParticipant, expenses, payments }: ParticipantListProps) {
+
+    const calculateParticipantData = () => {
+        return participants.map((participant) => {
+            const expensesPaid = expenses.filter(e => e.paidBy === participant.id)
+            const totalPaid = expensesPaid.reduce((sum, e) => sum + e.amount, 0)
+
+            const totalOwed = expenses.reduce((sum, expense) => {
+                if (
+                    expense.participants.includes(participant.id) &&
+                    expense.paidBy !== participant.id
+                ) {
+                    const numDebtors = expense.participants.length - 1
+                    if (numDebtors <= 0) return sum
+
+                    const share = expense.amount / numDebtors
+                    return sum + share
+                }
+                return sum
+            }, 0)
+
+            const totalReceivedPayments = payments
+                .filter(p => p.to === participant.id && p.status === "completed")
+                .reduce((sum, p) => sum + p.amount, 0)
+
+            const totalSentPayments = payments
+                .filter(p => p.from === participant.id && p.status === "completed")
+                .reduce((sum, p) => sum + p.amount, 0)
+
+            const balance = totalPaid + totalReceivedPayments - totalOwed - totalSentPayments
+
+            return {
+                ...participant,
+                totalPaid,
+                totalOwed,
+                balance,
+            }
+        })
+    }
+
+    const updatedParticipants = calculateParticipantData();
+
+    // const handleMarkPaid = async (participantId: string) => {
+    //     if (!firebaseService) return
+    //     try {
+    //         await firebaseService.markAsPaid(participantId)
+    //         console.log("Pagamentos registrados com sucesso!")
+    //     } catch (error) {
+    //         console.error("Erro ao marcar como pago:", error)
+    //     }
+    // }
+
     if (participants.length === 0) {
         return (
             <Card>
@@ -34,40 +87,40 @@ export function ParticipantList({ participants, onEditParticipant, onDeleteParti
     return (
         <div className="space-y-6">
             {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {participants.map((participant) => (
-                    <Card key={participant.id}>
-                        <CardContent className="p-6">
-                            <div className="flex items-center space-x-4">
-                                <Avatar className="h-12 w-12">
-                                    <AvatarImage src={participant.avatar || "/placeholder.svg"} />
-                                    <AvatarFallback>
-                                        {participant.name
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 space-y-1">
-                                    <h3 className="font-semibold">{participant.name}</h3>
-                                    <div className="flex items-center justify-between">
-                                        <Badge variant={participant.balance >= 0 ? "default" : "destructive"}>
-                                            {participant.balance >= 0 ? "+" : ""}€{participant.balance.toFixed(2)}
-                                        </Badge>
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                        Pagou: €{participant.totalPaid} | Deve: €{participant.totalOwed}
-                                    </div>
-                                    <Progress
-                                        value={participant.totalOwed > 0 ? (participant.totalPaid / participant.totalOwed) * 100 : 0}
-                                        className="h-2"
-                                    />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-4">*/}
+            {/*    {updatedParticipants.map((participant) => (*/}
+            {/*        <Card key={participant.id}>*/}
+            {/*            <CardContent className="p-6">*/}
+            {/*                <div className="flex items-center space-x-4">*/}
+            {/*                    <Avatar className="h-12 w-12">*/}
+            {/*                        <AvatarImage src={participant.avatar || "/placeholder.svg"} />*/}
+            {/*                        <AvatarFallback>*/}
+            {/*                            {participant.name*/}
+            {/*                                .split(" ")*/}
+            {/*                                .map((n) => n[0])*/}
+            {/*                                .join("")}*/}
+            {/*                        </AvatarFallback>*/}
+            {/*                    </Avatar>*/}
+            {/*                    <div className="flex-1 space-y-1">*/}
+            {/*                        <h3 className="font-semibold">{participant.name}</h3>*/}
+            {/*                        <div className="flex items-center justify-between">*/}
+            {/*                            <Badge variant={participant.balance >= 0 ? "default" : "destructive"}>*/}
+            {/*                                {participant.balance >= 0 ? "+" : ""}R${participant.balance.toFixed(2)}*/}
+            {/*                            </Badge>*/}
+            {/*                        </div>*/}
+            {/*                        <div className="text-xs text-muted-foreground">*/}
+            {/*                            Pagou: R${participant.totalPaid} | Deve: R${participant.totalOwed}*/}
+            {/*                        </div>*/}
+            {/*                        <Progress*/}
+            {/*                            value={participant.totalOwed > 0 ? (participant.totalPaid / participant.totalOwed) * 100 : 0}*/}
+            {/*                            className="h-2"*/}
+            {/*                        />*/}
+            {/*                    </div>*/}
+            {/*                </div>*/}
+            {/*            </CardContent>*/}
+            {/*        </Card>*/}
+            {/*    ))}*/}
+            {/*</div>*/}
 
             {/* Tabela Detalhada */}
             <Card>
@@ -88,7 +141,7 @@ export function ParticipantList({ participants, onEditParticipant, onDeleteParti
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {participants.map((participant) => (
+                                {updatedParticipants.map((participant) => (
                                     <TableRow key={participant.id}>
                                         <TableCell>
                                             <div className="flex items-center space-x-3">
@@ -106,11 +159,11 @@ export function ParticipantList({ participants, onEditParticipant, onDeleteParti
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-medium text-green-600">€{participant.totalPaid.toFixed(2)}</TableCell>
-                                        <TableCell className="font-medium text-orange-600">€{participant.totalOwed.toFixed(2)}</TableCell>
+                                        <TableCell className="font-medium text-green-600">R${participant.totalPaid.toFixed(2)}</TableCell>
+                                        <TableCell className="font-medium text-orange-600">R${participant.totalOwed.toFixed(2)}</TableCell>
                                         <TableCell>
                                             <Badge variant={participant.balance >= 0 ? "default" : "destructive"}>
-                                                {participant.balance >= 0 ? "+" : ""}€{participant.balance.toFixed(2)}
+                                                {participant.balance >= 0 ? "+" : ""}R${participant.balance.toFixed(2)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>

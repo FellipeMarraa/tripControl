@@ -87,7 +87,7 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                         </div>
 
                                         <Badge variant="outline" className="ml-4">
-                                            €{payment.amount.toFixed(2)}
+                                            R${payment.amount.toFixed(2)}
                                         </Badge>
                                     </div>
 
@@ -161,7 +161,7 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                                     <span className="text-sm">{getParticipantName(payment.to)}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="font-medium">€{payment.amount.toFixed(2)}</TableCell>
+                                            <TableCell className="font-medium">R${payment.amount.toFixed(2)}</TableCell>
                                             <TableCell className="text-sm">{new Date(payment.date).toLocaleDateString("pt-BR")}</TableCell>
                                             <TableCell>
                                                 <Badge variant="default">

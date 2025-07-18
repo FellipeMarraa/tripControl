@@ -118,7 +118,7 @@ export function PaymentDialog({ children, participants, onAddPayment, payment, o
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Valor (€)</Label>
+                            <Label htmlFor="amount">Valor (R$)</Label>
                             <Input
                                 id="amount"
                                 type="number"

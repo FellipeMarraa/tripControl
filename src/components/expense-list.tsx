@@ -77,14 +77,14 @@ export function ExpenseList({ expenses, participants, onEditExpense, onDeleteExp
                                         <div>
                                             <div className="font-medium">{expense.title}</div>
                                             <div className="text-sm text-muted-foreground">
-                                                €{expense.amountPerPerson.toFixed(2)} por pessoa
+                                                R${expense.amountPerPerson.toFixed(2)} por pessoa
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
                                         <Badge className={getCategoryColor(expense.category)}>{expense.category}</Badge>
                                     </TableCell>
-                                    <TableCell className="font-medium">€{expense.amount.toFixed(2)}</TableCell>
+                                    <TableCell className="font-medium">R${expense.amount.toFixed(2)}</TableCell>
                                     <TableCell>
                                         <div className="flex items-center space-x-2">
                                             <Avatar className="h-6 w-6">

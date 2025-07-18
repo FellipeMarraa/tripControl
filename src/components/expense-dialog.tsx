@@ -85,7 +85,7 @@ export function ExpenseDialog({ children, participants, onAddExpense, expense, o
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] max-h-full overflow-auto">
                 <DialogHeader>
                     <DialogTitle>{expense ? "Editar Despesa" : "Nova Despesa"}</DialogTitle>
                     <DialogDescription>
@@ -106,7 +106,7 @@ export function ExpenseDialog({ children, participants, onAddExpense, expense, o
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Valor Total (€)</Label>
+                            <Label htmlFor="amount">Valor Total (R$)</Label>
                             <Input
                                 id="amount"
                                 type="number"
@@ -171,6 +171,26 @@ export function ExpenseDialog({ children, participants, onAddExpense, expense, o
 
                     <div className="space-y-2">
                         <Label>Para Quem Foi a Despesa</Label>
+
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setSelectedParticipants(participants.map((p) => p.id))}
+                            >
+                                Marcar todos
+                            </Button>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setSelectedParticipants([])}
+                            >
+                                Desmarcar todos
+                            </Button>
+                        </div>
+
                         <div className="space-y-2 max-h-32 overflow-y-auto">
                             {participants.map((participant) => (
                                 <div key={participant.id} className="flex items-center space-x-2">
@@ -183,12 +203,14 @@ export function ExpenseDialog({ children, participants, onAddExpense, expense, o
                                 </div>
                             ))}
                         </div>
+
                         {selectedParticipants.length > 0 && amount && (
                             <p className="text-sm text-muted-foreground">
-                                Valor por pessoa: €{(Number.parseFloat(amount) / selectedParticipants.length).toFixed(2)}
+                                Valor por pessoa: R${(Number.parseFloat(amount) / selectedParticipants.length).toFixed(2)}
                             </p>
                         )}
                     </div>
+
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => setOpen(false)}>
