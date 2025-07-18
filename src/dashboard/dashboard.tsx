@@ -313,19 +313,19 @@ export default function TravelExpenseTracker() {
                 <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
                     <div className="hidden lg:block">
                         <TabsList className="hidden lg:grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
-                            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                            <TabsTrigger value="dashboard" className="flex items-center gap-2 cursor-pointer">
                                 <FileText className="h-4 w-4"/> Dashboard
                             </TabsTrigger>
-                            <TabsTrigger value="expenses" className="flex items-center gap-2">
+                            <TabsTrigger value="expenses" className="flex items-center gap-2 cursor-pointer">
                                 <Receipt className="h-4 w-4"/> Despesas
                             </TabsTrigger>
-                            <TabsTrigger value="participants" className="flex items-center gap-2">
+                            <TabsTrigger value="participants" className="flex items-center gap-2 cursor-pointer">
                                 <Users className="h-4 w-4"/> Participantes
                             </TabsTrigger>
-                            <TabsTrigger value="payments" className="flex items-center gap-2">
+                            <TabsTrigger value="payments" className="flex items-center gap-2 cursor-pointer">
                                 <CreditCard className="h-4 w-4"/> Pagamentos
                             </TabsTrigger>
-                            <TabsTrigger value="reports" className="flex items-center gap-2">
+                            <TabsTrigger value="reports" className="flex items-center gap-2 cursor-pointer">
                                 <FileText className="h-4 w-4"/> Relatórios
                             </TabsTrigger>
                         </TabsList>
@@ -503,8 +503,7 @@ export default function TravelExpenseTracker() {
                             </div>
                             <ParticipantDialog onAddParticipant={handleAddParticipant}>
                                 <Button>
-                                    <Plus className="h-4 w-4 mr-2"/>
-                                    Adicionar Participante
+                                    <Plus className="h-4 w-4"/>
                                 </Button>
                             </ParticipantDialog>
                         </div>
