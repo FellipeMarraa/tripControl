@@ -1,16 +1,21 @@
-import './App.css'
-import {Button} from "@/components/ui/button.tsx";
+import {Routes} from '@/routes';
+import './App.css';
+import {Toaster} from '@/components/ui/toaster';
+import {TooltipProvider} from "@/components/ui/tooltip.tsx";
+import {BrowserRouter} from 'react-router-dom';
+import {AuthProvider} from "@/hooks/use-auth.tsx";
 
 function App() {
-
-  return (
-    <>
-      <h1 className="text-3xl font-bold underline">Vite + React</h1>
-        <div className="flex min-h-svh flex-col items-center justify-center">
-            <Button>Click me</Button>
-        </div>
-    </>
-  )
+    return (
+        <BrowserRouter>
+            <AuthProvider>
+                <TooltipProvider>
+                    <Routes />
+                    <Toaster />
+                </TooltipProvider>
+            </AuthProvider>
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;
