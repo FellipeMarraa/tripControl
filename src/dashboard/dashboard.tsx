@@ -114,6 +114,12 @@ export default function TravelExpenseTracker() {
         }
     }
 
+    const handleDeletePayment = async (id: string) => {
+        if (firebaseService) {
+            await firebaseService.deletePayment(id)
+        }
+    }
+
     const handleAddPayment = async (payment: Omit<Payment, "id">) => {
         if (firebaseService) {
             await firebaseService.addPayment(payment)
@@ -473,8 +479,7 @@ export default function TravelExpenseTracker() {
                             </div>
                             <ExpenseDialog participants={participants} onAddExpense={handleAddExpense}>
                                 <Button>
-                                    <Plus className="h-4 w-4 mr-2"/>
-                                    Nova Despesa
+                                    <Plus className="h-4 w-4"/>
                                 </Button>
                             </ExpenseDialog>
                         </div>
@@ -524,8 +529,7 @@ export default function TravelExpenseTracker() {
                             </div>
                             <PaymentDialog participants={participants} onAddPayment={handleAddPayment}>
                                 <Button>
-                                    <Plus className="h-4 w-4 mr-2"/>
-                                    Registrar Pagamento
+                                    <Plus className="h-4 w-4"/>
                                 </Button>
                             </PaymentDialog>
                         </div>
@@ -534,6 +538,9 @@ export default function TravelExpenseTracker() {
                             participants={participants}
                             onUpdatePayment={(payment) => {
                                 handleUpdatePayment(payment)
+                            }}
+                            onDeletePayment={(id) => {
+                                handleDeletePayment(id)
                             }}
                         />
                     </TabsContent>

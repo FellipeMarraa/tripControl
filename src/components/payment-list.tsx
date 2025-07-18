@@ -1,20 +1,22 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Check, Clock, ArrowRight } from "lucide-react"
-import type { Payment, Participant } from "../model/types.ts"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table"
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {ArrowRight, Check, Clock, Trash} from "lucide-react"
+import type {Participant, Payment} from "../model/types.ts"
 
 interface PaymentListProps {
-    payments: Payment[]
-    participants: Participant[]
-    onUpdatePayment: (payment: Payment) => void
+    payments: Payment[],
+    participants: Participant[],
+    onUpdatePayment: (payment: Payment) => void,
+    onDeletePayment: (id: string) => void
 }
 
-export function PaymentList({ payments, participants, onUpdatePayment }: PaymentListProps) {
+export function PaymentList({payments, participants, onUpdatePayment, onDeletePayment}: PaymentListProps) {
+
     const getParticipantName = (id: string) => {
         return participants.find((p) => p.id === id)?.name || "Desconhecido"
     }
@@ -40,7 +42,7 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Clock className="h-5 w-5" />
+                        <Clock className="h-5 w-5"/>
                         Transferências Pendentes ({pendingPayments.length})
                     </CardTitle>
                 </CardHeader>
@@ -48,7 +50,7 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                     {pendingPayments.length === 0 ? (
                         <div className="text-center py-8">
                             <div className="text-muted-foreground">
-                                <Check className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                                <Check className="h-12 w-12 mx-auto mb-4 text-green-500"/>
                                 <h3 className="text-lg font-semibold mb-2">Todas as contas estão quitadas!</h3>
                                 <p>Não há transferências pendentes no momento.</p>
                             </div>
@@ -56,11 +58,13 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                     ) : (
                         <div className="space-y-4">
                             {pendingPayments.map((payment) => (
-                                <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                <div key={payment.id}
+                                     className="flex items-center justify-between p-4 border rounded-lg">
                                     <div className="flex items-center space-x-4">
                                         <div className="flex items-center space-x-2">
                                             <Avatar className="h-8 w-8">
-                                                <AvatarImage src={getParticipantAvatar(payment.from) || "/placeholder.svg"} />
+                                                <AvatarImage
+                                                    src={getParticipantAvatar(payment.from) || "/placeholder.svg"}/>
                                                 <AvatarFallback className="text-xs">
                                                     {getParticipantName(payment.from)
                                                         .split(" ")
@@ -71,11 +75,12 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                             <span className="font-medium">{getParticipantName(payment.from)}</span>
                                         </div>
 
-                                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                        <ArrowRight className="h-4 w-4 text-muted-foreground"/>
 
                                         <div className="flex items-center space-x-2">
                                             <Avatar className="h-8 w-8">
-                                                <AvatarImage src={getParticipantAvatar(payment.to) || "/placeholder.svg"} />
+                                                <AvatarImage
+                                                    src={getParticipantAvatar(payment.to) || "/placeholder.svg"}/>
                                                 <AvatarFallback className="text-xs">
                                                     {getParticipantName(payment.to)
                                                         .split(" ")
@@ -93,11 +98,11 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
 
                                     <div className="flex items-center space-x-2">
                                         <Badge variant="secondary">
-                                            <Clock className="h-3 w-3 mr-1" />
+                                            <Clock className="h-3 w-3 mr-1"/>
                                             Pendente
                                         </Badge>
                                         <Button size="sm" onClick={() => handleMarkAsPaid(payment)}>
-                                            <Check className="h-4 w-4 mr-1" />
+                                            <Check className="h-4 w-4 mr-1"/>
                                             Marcar como Pago
                                         </Button>
                                     </div>
@@ -113,7 +118,7 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Check className="h-5 w-5 text-green-500" />
+                            <Check className="h-5 w-5 text-green-500"/>
                             Histórico de Pagamentos ({completedPayments.length})
                         </CardTitle>
                     </CardHeader>
@@ -136,7 +141,8 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                             <TableCell>
                                                 <div className="flex items-center space-x-2">
                                                     <Avatar className="h-6 w-6">
-                                                        <AvatarImage src={getParticipantAvatar(payment.from) || "/placeholder.svg"} />
+                                                        <AvatarImage
+                                                            src={getParticipantAvatar(payment.from) || "/placeholder.svg"}/>
                                                         <AvatarFallback className="text-xs">
                                                             {getParticipantName(payment.from)
                                                                 .split(" ")
@@ -150,7 +156,8 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                             <TableCell>
                                                 <div className="flex items-center space-x-2">
                                                     <Avatar className="h-6 w-6">
-                                                        <AvatarImage src={getParticipantAvatar(payment.to) || "/placeholder.svg"} />
+                                                        <AvatarImage
+                                                            src={getParticipantAvatar(payment.to) || "/placeholder.svg"}/>
                                                         <AvatarFallback className="text-xs">
                                                             {getParticipantName(payment.to)
                                                                 .split(" ")
@@ -162,14 +169,19 @@ export function PaymentList({ payments, participants, onUpdatePayment }: Payment
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-medium">R${payment.amount.toFixed(2)}</TableCell>
-                                            <TableCell className="text-sm">{new Date(payment.date).toLocaleDateString("pt-BR")}</TableCell>
+                                            <TableCell
+                                                className="text-sm">{new Date(payment.date).toLocaleDateString("pt-BR")}</TableCell>
                                             <TableCell>
                                                 <Badge variant="default">
-                                                    <Check className="h-3 w-3 mr-1" />
+                                                    <Check className="h-3 w-3 mr-1"/>
                                                     Pago
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">{payment.note || "-"}</TableCell>
+                                            <TableCell
+                                                className="text-sm text-muted-foreground">{payment.note || "-"}</TableCell>
+                                            <TableCell className="text-sm text-muted-foreground"><Trash
+                                                className="text-red-500 h-4 w-4 cursor-pointer"
+                                                onClick={() => onDeletePayment(payment.id)}/></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

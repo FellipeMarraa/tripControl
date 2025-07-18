@@ -1,18 +1,17 @@
 import {
-    collection,
-    doc,
     addDoc,
-    updateDoc,
+    collection,
     deleteDoc,
-    query,
-    where,
-    orderBy,
+    doc,
     onSnapshot,
+    orderBy,
+    query,
     Timestamp,
-    getDocs,
+    updateDoc,
+    where,
 } from "firebase/firestore"
-import { db } from "./firebase"
-import type { Participant, Expense, Payment } from "../model/types.ts"
+import {db} from "./firebase"
+import type {Expense, Participant, Payment} from "../model/types.ts"
 
 export class FirebaseService {
     private userId: string
@@ -62,15 +61,14 @@ export class FirebaseService {
             createdAt: Timestamp.now(),
         })
 
-        // Depois de criar a despesa, criar os pagamentos automáticos
         const paymentsToAdd: Omit<Payment, "id">[] = expense.participants
-            .filter((participantId) => participantId !== expense.paidBy) // só quem não pagou
+            .filter((participantId) => participantId !== expense.paidBy)
             .map((participantId) => ({
                 from: participantId,
                 to: expense.paidBy,
                 amount: expense.amountPerPerson,
                 date: new Date().toISOString().split("T")[0],
-                status: "pending", // começa pendente
+                status: "pending",
                 note: `Pagamento da despesa: ${expense.title}`,
             }))
 
@@ -123,6 +121,10 @@ export class FirebaseService {
         })
     }
 
+    async deletePayment(id: string) {
+        await deleteDoc(doc(db, "payments", id))
+    }
+
     subscribeToPayments(callback: (payments: Payment[]) => void) {
         const q = query(collection(db, "payments"), where("userId", "==", this.userId), orderBy("createdAt", "desc"))
 
@@ -133,31 +135,6 @@ export class FirebaseService {
             })) as Payment[]
             callback(payments)
         })
-    }
-
-    async markAsPaid(participantId: string) {
-        const q = query(collection(db, "expenses"), where("userId", "==", this.userId))
-        const snapshot = await getDocs(q)
-
-        const payments: Omit<Payment, "id">[] = []
-
-        snapshot.forEach((docSnap) => {
-            const data = docSnap.data() as Expense
-
-            if (data.participants.includes(participantId) && data.paidBy !== participantId) {
-                payments.push({
-                    from: participantId,
-                    to: data.paidBy,
-                    amount: data.amountPerPerson,
-                    date: new Date().toISOString().split("T")[0],
-                    status: "completed",
-                    note: `Pagamento da despesa: ${data.title}`,
-                })
-            }
-        })
-
-        const addPromises = payments.map((payment) => this.addPayment(payment))
-        await Promise.all(addPromises)
     }
 
 }
